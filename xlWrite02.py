@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import time
 from bs4 import BeautifulSoup
+from openpyxl import Workbook, load_workbook
 # ______________________________________________________
 class STU:
     def __init__(self):
@@ -51,14 +52,18 @@ class STU:
         # 개봉순
         # //*[@id="content"]/div[1]/div[1]/div[2]/ul[2]/li[2]/a
         self.driver.find_element_by_xpath(
-            '//*[@id="content"]/div[1]/div[1]/div[3]/ul/li[1]/dl/dt/a').click();time.sleep(2)
+            '//*[@id="content"]/div[1]/div[1]/div[2]/ul[2]/li[2]/a').click();time.sleep(2)
         # #content > div.article > div:nth-child(1) > div.lst_wrap > ul > li:nth-child(1) > dl > dt > a
         bsObject = BeautifulSoup(self.driver.page_source, "html.parser")
         mvList = bsObject.select('dt.tit > a')
-        
+        for n, i in enumerate(mvList):
+            self.currentMov["releaseMovi"][n+1] = i.string
+            print (i.string)
+
 def main():
     sNode = STU()
     sNode.urlRequests()
-
+    # 개봉순
+    sNode.requestRelease()
 if __name__ == "__main__":
     main()
