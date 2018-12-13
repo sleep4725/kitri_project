@@ -6,13 +6,12 @@ from openpyxl import Workbook, load_workbook
 import os
 import json
 from collections import OrderedDict
+import sys
 # ______________________________________________________
 class STU:
     def __init__(self):
         # 작업 디렉토리 이동 ____________________
         os.chdir("C:\\Users\\sleep\\Desktop\\Today_01")
-        # excel data _________________________
-        self.workBook = load_workbook('C:\\Users\\sleep\\Desktop\\Today_01\\mv.xlsx')
         self.target_url = "https://movie.naver.com/"
         #-------------------------------------
         self.options = Options()# 객체 생성
@@ -50,11 +49,27 @@ class STU:
             # print(i.string)
 
     def doExcel(self, mark, content):
+        # excel data _________________________
+        try:
+            self.workBook = load_workbook('C:\\Users\\sleep\\Desktop\\Today_01\\mv.xlsx')
+        except FileNotFoundError as e:
+            try:
+                self.workBook = Workbook()
+                self.workBook.save(filename='C:\\Users\\sleep\\Desktop\\Today_01\\mv.xlsx')
+            except:
+                print ("excel file create error ")
+                sys.exit(1)
+            else:
+                self.workBook = load_workbook('C:\\Users\\sleep\\Desktop\\Today_01\\mv.xlsx')
+
         # excel write_
         NUM_INDX = ['B',3]
         MOV_CONT = ['C',3]
         # Sheet 생성___
         wsheet = self.workBook.create_sheet(title=content)
+        # Cell 열너비 조정
+        wsheet.column_dimensions[].width = 47.4
+        # Cell 데이터 적재
         wsheet[NUM_INDX[0] + str(NUM_INDX[1])] = "순위"
         wsheet[MOV_CONT[0] + str(MOV_CONT[1])] = "영화이름"
         # 내용입력
@@ -65,6 +80,7 @@ class STU:
             # _____________________________________
             wsheet[NUM_INDX[0] + str(NUM_INDX[1])] = i  # 순위
             wsheet[MOV_CONT[0] + str(MOV_CONT[1])] = self.currentMov[mark][i]  # 내용
+        self.workBook.save("C:\\Users\\sleep\\Desktop\\Today_01\\mv.xlsx")
 
     # Instance method (2)
     def requestReserve(self):
@@ -117,21 +133,13 @@ class STU:
         with open('movie.json', 'w', encoding='utf-8') as makeJson:
             json.dump(fileData, makeJson, ensure_ascii=False, indent="\t")
 
-
-    def __del__(self):
-        self.workBook.save("C:\\Users\\sleep\\Desktop\\Today_01\\mv.xlsx")
-
 def main():
     sNode = STU()
     sNode.urlRequests()
-    # 예매순
-    sNode.requestReserve()
-    # 개봉순
-    sNode.requestRelease()
-    # 평점순
-    sNode.requestGradeMovi()
-    # 좋아요 순
-    sNode.requestlikeMovi()
-
+    sNode.requestReserve()      # 예매순
+    sNode.requestRelease()      # 개봉순
+    sNode.requestGradeMovi()    # 평점순
+    sNode.requestlikeMovi()     # 좋아요 순
+    sNode.jsonFileCreate()      # json
 if __name__ == "__main__":
     main()
