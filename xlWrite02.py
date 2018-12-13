@@ -68,7 +68,7 @@ class STU:
         # Sheet 생성___
         wsheet = self.workBook.create_sheet(title=content)
         # Cell 열너비 조정
-        wsheet.column_dimensions[].width = 47.4
+        wsheet.column_dimensions['C'].width = 47.4
         # Cell 데이터 적재
         wsheet[NUM_INDX[0] + str(NUM_INDX[1])] = "순위"
         wsheet[MOV_CONT[0] + str(MOV_CONT[1])] = "영화이름"
