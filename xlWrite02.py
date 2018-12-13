@@ -4,6 +4,8 @@ import time
 from bs4 import BeautifulSoup
 from openpyxl import Workbook, load_workbook
 import os
+import json
+from collections import OrderedDict
 # ______________________________________________________
 class STU:
     def __init__(self):
@@ -45,7 +47,7 @@ class STU:
         mvList = bsObject.select('dt.tit > a')
         for n, i in enumerate(mvList):
             self.currentMov[mark][n + 1] = i.string
-            print(i.string)
+            # print(i.string)
 
     def doExcel(self, mark, content):
         # excel write_
@@ -104,6 +106,17 @@ class STU:
         print("좋아요 순 진행 중 ... ")
         self.doCommon('likeMovi')
         self.doExcel('likeMovi', '좋아요 순')
+
+    # Instance method (6)
+    def jsonFileCreate(self):
+        fileData = OrderedDict()
+        fileData['Reserve']   = self.currentMov['reservMovi']    # 예매순
+        fileData['Release']   = self.currentMov['releaseMovi']   # 개봉순
+        fileData['GradeMovi'] = self.currentMov['gradeMovi']     # 평점순
+        fileData['likeMovi']  = self.currentMov['likeMovi']      # 좋아요순
+        with open('movie.json', 'w', encoding='utf-8') as makeJson:
+            json.dump(fileData, makeJson, ensure_ascii=False, indent="\t")
+
 
     def __del__(self):
         self.workBook.save("C:\\Users\\sleep\\Desktop\\Today_01\\mv.xlsx")
