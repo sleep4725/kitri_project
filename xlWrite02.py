@@ -3,9 +3,14 @@ from selenium.webdriver.chrome.options import Options
 import time
 from bs4 import BeautifulSoup
 from openpyxl import Workbook, load_workbook
+import os
 # ______________________________________________________
 class STU:
     def __init__(self):
+        # 작업 디렉토리 이동 ____________________
+        os.chdir("C:\\Users\\sleep\\Desktop\\Today_01")
+        # excel data _________________________
+        self.workBook = load_workbook('C:\\Users\\sleep\\Desktop\\Today_01\\mv.xlsx')
         self.target_url = "https://movie.naver.com/"
         #-------------------------------------
         self.options = Options()# 객체 생성
@@ -35,35 +40,85 @@ class STU:
         assert "현재 상영영화 : 네이버 영화" in self.driver.title
         print (self.driver.title)
 
+    def doCommon(self, mark):
+        bsObject = BeautifulSoup(self.driver.page_source, "html.parser")
+        mvList = bsObject.select('dt.tit > a')
+        for n, i in enumerate(mvList):
+            self.currentMov[mark][n + 1] = i.string
+            print(i.string)
+
+    def doExcel(self, mark, content):
+        # excel write_
+        NUM_INDX = ['B',3]
+        MOV_CONT = ['C',3]
+        # Sheet 생성___
+        wsheet = self.workBook.create_sheet(title=content)
+        wsheet[NUM_INDX[0] + str(NUM_INDX[1])] = "순위"
+        wsheet[MOV_CONT[0] + str(MOV_CONT[1])] = "영화이름"
+        # 내용입력
+        for i in self.currentMov["reservMovi"].keys():
+            # 인덱스 증가____________________________
+            NUM_INDX[1] += 1
+            MOV_CONT[1] += 1
+            # _____________________________________
+            wsheet[NUM_INDX[0] + str(NUM_INDX[1])] = i  # 순위
+            wsheet[MOV_CONT[0] + str(MOV_CONT[1])] = self.currentMov[mark][i]  # 내용
+
+    # Instance method (2)
     def requestReserve(self):
         # 예매순
         # //*[@id="content"]/div[1]/div[1]/div[2]/ul[2]/li[1]/a
         self.driver.find_element_by_xpath(
             '//*[@id="content"]/div[1]/div[1]/div[2]/ul[2]/li[1]/a').click();time.sleep(2)
+        print ("예매순 진행 중 ... ")
+        self.doCommon("reservMovi")
+        self.doExcel('reservMovi', '예매순')
 
-        bsObject = BeautifulSoup(self.driver.page_source, "html.parser")
-        mvList   = bsObject.select('dt.tit > a')
-
-        for n, i in enumerate(mvList):
-            self.currentMov["reservMovi"][n+1] = i.string
-            print (i.string)
-
+    # Instance method (3)
     def requestRelease(self):
         # 개봉순
         # //*[@id="content"]/div[1]/div[1]/div[2]/ul[2]/li[2]/a
         self.driver.find_element_by_xpath(
             '//*[@id="content"]/div[1]/div[1]/div[2]/ul[2]/li[2]/a').click();time.sleep(2)
         # #content > div.article > div:nth-child(1) > div.lst_wrap > ul > li:nth-child(1) > dl > dt > a
-        bsObject = BeautifulSoup(self.driver.page_source, "html.parser")
-        mvList = bsObject.select('dt.tit > a')
-        for n, i in enumerate(mvList):
-            self.currentMov["releaseMovi"][n+1] = i.string
-            print (i.string)
+        print("개봉순 진행 중 ... ")
+        self.doCommon('releaseMovi')
+        self.doExcel('releaseMovi', '개봉순')
+
+    # Instance method (4)
+    def requestGradeMovi(self):
+        # 평점순
+        # //*[@id="content"]/div[1]/div[1]/div[2]/ul[2]/li[3]/a
+        self.driver.find_element_by_xpath(
+            '//*[@id="content"]/div[1]/div[1]/div[2]/ul[2]/li[3]/a').click();time.sleep(2)
+        print("평점순 진행 중 ... ")
+        self.doCommon('gradeMovi')
+        self.doExcel('gradeMovi', '평점순')
+
+    # Instance method (5)
+    def requestlikeMovi(self):
+        # 좋아요 순
+        # //*[@id="content"]/div[1]/div[1]/div[2]/ul[2]/li[4]/a
+        self.driver.find_element_by_xpath(
+            '//*[@id="content"]/div[1]/div[1]/div[2]/ul[2]/li[4]/a').click();time.sleep(2)
+        print("좋아요 순 진행 중 ... ")
+        self.doCommon('likeMovi')
+        self.doExcel('likeMovi', '좋아요 순')
+
+    def __del__(self):
+        self.workBook.save("C:\\Users\\sleep\\Desktop\\Today_01\\mv.xlsx")
 
 def main():
     sNode = STU()
     sNode.urlRequests()
+    # 예매순
+    sNode.requestReserve()
     # 개봉순
     sNode.requestRelease()
+    # 평점순
+    sNode.requestGradeMovi()
+    # 좋아요 순
+    sNode.requestlikeMovi()
+
 if __name__ == "__main__":
     main()
