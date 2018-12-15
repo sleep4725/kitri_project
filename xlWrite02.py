@@ -11,7 +11,13 @@ import sys
 class STU:
     def __init__(self):
         # 작업 디렉토리 이동 ____________________
-        os.chdir("C:\\Users\\sleep\\Desktop\\Today_01")
+        try:
+            os.chdir("C:\\Users\\sleep\\Desktop\\Today_01")
+        except:
+            os.mkdir("C:\\Users\\sleep\\Desktop\\Today_01")
+            os.chdir("C:\\Users\\sleep\\Desktop\\Today_01")
+        finally:
+            print ("current directory : {}".format(os.curdir))
         self.target_url = "https://movie.naver.com/"
         #-------------------------------------
         self.options = Options()# 객체 생성
