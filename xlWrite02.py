@@ -7,6 +7,7 @@ import os
 import json
 from collections import OrderedDict
 import sys
+import yaml
 # ______________________________________________________
 class STU:
     def __init__(self):
@@ -17,7 +18,7 @@ class STU:
             os.mkdir("C:\\Users\\sleep\\Desktop\\Today_01")
             os.chdir("C:\\Users\\sleep\\Desktop\\Today_01")
         finally:
-            print ("current directory : {}".format(os.curdir))
+            print ("current directory : {}".format(os.path.abspath(os.curdir)))
         self.target_url = "https://movie.naver.com/"
         #-------------------------------------
         self.options = Options()# 객체 생성
@@ -138,6 +139,8 @@ class STU:
         fileData['likeMovi']  = self.currentMov['likeMovi']      # 좋아요순
         with open('movie.json', 'w', encoding='utf-8') as makeJson:
             json.dump(fileData, makeJson, ensure_ascii=False, indent="\t")
+
+        makeJson.close()
 
 def main():
     sNode = STU()
